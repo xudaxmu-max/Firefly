@@ -1,11 +1,13 @@
 ---
-title: my test blog
-date: 2026-08-05
+title: 测试看看
+published: 2026-08-05
+description: 简单介绍
+image: ./cover.jpg
 tags:
-  - 博客
-  - 示例
-author: 华仔
-published: true
+  - 开发
+  - 布局
+category: 测试
+draft: false
 ---
 ![9f879ffd4de964bf7bf9c53d0c1b3bd6.jpg](https://tu.87651818.xyz/file/pic/blog/1785867728995_9f879ffd4de964bf7bf9c53d0c1b3bd6.jpg)
 # 如何快速上手solidworks
