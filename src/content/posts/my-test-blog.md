@@ -3,9 +3,7 @@ title: 测试看看
 published: 2026-08-05
 description: 简单介绍
 image: ./cover.jpg
-tags:
-  - 开发
-  - 布局
+tags:[测试]
 category: 测试
 draft: false
 ---
