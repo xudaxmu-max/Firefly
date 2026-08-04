@@ -5,6 +5,7 @@ tags:
   - 博客
   - 示例
 author: 华仔
+published: true
 ---
 ![9f879ffd4de964bf7bf9c53d0c1b3bd6.jpg](https://tu.87651818.xyz/file/pic/blog/1785867728995_9f879ffd4de964bf7bf9c53d0c1b3bd6.jpg)
 # 如何快速上手solidworks
