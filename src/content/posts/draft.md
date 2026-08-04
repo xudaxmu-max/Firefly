@@ -6,8 +6,9 @@ tags:
   - 博客
   - 演示
 category: 文章示例
-draft: true
+draft:false
 slug: draft
+date: 2026-08-05
 ---
 
 # 这篇文章是草稿
