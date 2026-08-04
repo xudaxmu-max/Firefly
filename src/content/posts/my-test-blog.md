@@ -12,6 +12,4 @@ author: 华仔
 # 然后参考这个
 ![第1章-概述.pdf](https://tu.87651818.xyz/file/pdf/1784775246867_第1章-概述.pdf![第1章-概述.pdf](https://tu.87651818.xyz/file/pdf/1784775246867_第1章-概述.pdf)
 
-
-![第1章-概述.pdf](https://tu.87651818.xyz/file/pdf/1784775246867_第1章-概述.pdf)
 <img src="https://tu.87651818.xyz/file/pdf/1784775246867_第1章-概述.pdf" alt="第1章-概述.pdf" width=100%>
