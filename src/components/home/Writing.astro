@@ -1,0 +1,372 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { processCoverImageSync } from "@/utils/image-utils";
+import { getPostUrlBySlug } from "@/utils/url-utils";
+import { posix } from "node:path";
+
+const files = import.meta.glob<string>(
+	"/src/content/posts/**/*.{jpg,jpeg,png,webp,avif,gif,svg}",
+	{ eager: true, query: "?url", import: "default" },
+);
+interface Props {
+	entries: CollectionEntry<"posts">[];
+}
+const entries = [...Astro.props.entries].sort(
+	(a, b) =>
+		b.data.published.getTime() - a.data.published.getTime() ||
+		a.id.localeCompare(b.id),
+);
+const posts = entries.map(({ id, data, filePath }) => {
+	let image = processCoverImageSync(data.image, id);
+	if (image && !/^(?:\/|https?:)/i.test(image)) {
+		const source =
+			filePath?.replace(/^.*?src\/content\//, "/src/content/") ||
+			"/src/content/posts/" + id + ".md";
+		image = files[posix.resolve(posix.dirname(source), image)] || "";
+	}
+	return {
+		id,
+		...data,
+		image,
+		href: getPostUrlBySlug(id),
+		date: data.published.toISOString().slice(0, 10),
+	};
+});
+const lead =
+	posts.find((p) => p.id.includes("如何快速开始下一步焊接工作")) || posts[0];
+const remaining = posts.filter((p) => p !== lead);
+---
+
+<section id="articles" aria-labelledby="writing-title">
+	<div class="section-head">
+		<h2 id="writing-title">文章</h2><span>共 {posts.length} 篇</span>
+	</div>
+	{
+		lead && (
+			<article class="lead">
+				{lead.image && (
+					<a class="plate" href={lead.image} aria-label="查看精选文章封面原图">
+						<img
+							src={lead.image}
+							alt={
+								lead.title.includes("焊接")
+									? "PCB 主板全貌，可打开原图查看元件细节"
+									: lead.title
+							}
+							loading="lazy"
+						/>
+						<span>查看原图 ↗</span>
+					</a>
+				)}
+				<div class="lead-copy">
+					<div class="meta">
+						<>
+							<strong>精选文章</strong>
+							<time datetime={lead.date}>{lead.date}</time>
+							<span>{lead.category}</span>
+						</>
+					</div>
+					<h3>
+						<a href={lead.href}>{lead.title}</a>
+					</h3>
+					{lead.description && <p>{lead.description}</p>}
+					<a class="read-link" href={lead.href}>
+						阅读全文 <span>↗</span>
+					</a>
+				</div>
+			</article>
+		)
+	}
+	{
+		remaining.length > 0 && (
+			<div class="index">
+				<ul>
+					{remaining.map((p, i) => (
+						<li>
+							<a class="row" href={p.href} data-index={i}>
+								<time datetime={p.date}>{p.date}</time>
+								<span class="row-title">{p.title}</span>
+								<span class="category">{p.category}</span>
+								{p.image && (
+									<img class="thumb" src={p.image} loading="lazy" alt="" />
+								)}
+							</a>
+						</li>
+					))}
+				</ul>
+				<div class="preview" aria-hidden="true">
+					{remaining.map(
+						(p, i) =>
+							p.image && (
+								<img
+									data-index={i}
+									class:list={[{ active: i === 0 }]}
+									src={p.image}
+									loading="lazy"
+									alt=""
+								/>
+							),
+					)}
+				</div>
+			</div>
+		)
+	}
+	{!lead && <p>暂无公开文章</p>}
+</section>
+<script>
+	const previews = document.querySelectorAll<HTMLImageElement>(".preview img");
+	for (const row of document.querySelectorAll<HTMLAnchorElement>(".row")) {
+		function show() {
+			for (const preview of previews)
+				preview.classList.toggle(
+					"active",
+					preview.dataset.index === row.dataset.index,
+				);
+		}
+		row.addEventListener("pointerenter", show);
+		row.addEventListener("focus", show);
+	}
+</script>
+<style>
+	#articles {
+		padding: clamp(78px, 6vw, 108px) var(--edge) clamp(38px, 5vw, 90px);
+		background: #f5f1e8;
+		color: #24251f;
+	}
+	.section-head,
+	.meta,
+	.read-link {
+		display: flex;
+		align-items: center;
+	}
+	.section-head {
+		align-items: baseline;
+		justify-content: space-between;
+		border-bottom: 1px solid #948b77;
+		padding-bottom: 18px;
+		margin-bottom: clamp(22px, 2.6vw, 44px);
+	}
+	h2,
+	h3,
+	p,
+	ul {
+		margin: 0;
+	}
+	h2 {
+		font-size: clamp(37px, 4.5vw, 78px);
+		line-height: 1;
+		font-weight: 650;
+		letter-spacing: -0.05em;
+	}
+	.section-head > span,
+	.meta,
+	.category {
+		font-size: 13px;
+		color: #58574e;
+	}
+	.lead {
+		display: grid;
+		grid-template-columns: minmax(0, 1.32fr) minmax(0, 1fr);
+		align-items: center;
+		gap: clamp(30px, 5vw, 100px);
+	}
+	.lead-copy:only-child {
+		grid-column: 1/-1;
+	}
+	.plate {
+		display: grid;
+		place-items: center;
+		position: relative;
+		aspect-ratio: 1.85;
+		background-color: #dce0d5;
+		background-image:
+			linear-gradient(#676f5720 1px, transparent 1px),
+			linear-gradient(90deg, #676f5720 1px, transparent 1px);
+		background-size: 25px 25px;
+	}
+	.plate img {
+		width: 88%;
+		height: 86%;
+		position: absolute;
+		object-fit: contain;
+	}
+	.plate > span {
+		position: absolute;
+		right: 12px;
+		bottom: 10px;
+		color: #2c362a;
+		background: #ebeee4;
+		padding: 4px 8px;
+		font-size: 12px;
+	}
+	.meta {
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+	.meta strong {
+		font-weight: 650;
+		color: #765629;
+		border-bottom: 1px solid #9a7540;
+	}
+	.lead h3 {
+		font-size: clamp(24px, 2.65vw, 52px);
+		line-height: 1.3;
+		letter-spacing: -0.035em;
+		margin: 16px 0;
+		max-width: 20em;
+		text-wrap: pretty;
+	}
+	.lead-copy p {
+		color: #56564b;
+		max-width: 36em;
+		font-size: clamp(15px, 1.05vw, 19px);
+		line-height: 1.75;
+	}
+	.read-link {
+		width: max-content;
+		gap: 18px;
+		border-bottom: 1px solid #8a784f;
+		margin-top: 22px;
+		padding-bottom: 4px;
+		font-weight: 650;
+	}
+	.lead-copy a:hover,
+	.row:hover .row-title,
+	.row:focus-visible .row-title {
+		color: #795622;
+	}
+	.index {
+		margin-top: clamp(30px, 4vw, 65px);
+		display: grid;
+		grid-template-columns: minmax(0, 3fr) minmax(170px, 1fr);
+		gap: 4vw;
+	}
+	.index ul {
+		list-style: none;
+		padding: 0;
+		border-top: 1px solid #a69d8b;
+	}
+	.row {
+		display: grid;
+		grid-template-columns: 95px 1fr 6em;
+		gap: 18px;
+		align-items: baseline;
+		border-bottom: 1px solid #c7c2b6;
+		padding: 20px 0;
+	}
+	.row-title {
+		font-size: clamp(17px, 1.4vw, 25px);
+		font-weight: 600;
+		line-height: 1.5;
+		overflow-wrap: anywhere;
+	}
+	.row time {
+		color: #595a4e;
+		font-size: 12px;
+	}
+	.category {
+		text-align: right;
+	}
+	.preview {
+		position: relative;
+		align-self: start;
+		aspect-ratio: 1.45;
+		background: #e9e7dc;
+	}
+	.preview img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		opacity: 0;
+		transition: opacity 0.2s ease;
+	}
+	.preview .active {
+		opacity: 1;
+	}
+	.thumb {
+		display: none;
+	}
+	@media (max-width: 850px) {
+		.index {
+			grid-template-columns: minmax(0, 2.8fr) minmax(125px, 1fr);
+		}
+		.row {
+			grid-template-columns: 80px 1fr;
+			gap: 5px 12px;
+		}
+		.category {
+			grid-column: 2;
+			text-align: left;
+		}
+		.lead {
+			gap: 24px;
+		}
+		.meta {
+			gap: 8px;
+		}
+		.lead-copy p {
+			font-size: 14px;
+		}
+	}
+	@media (max-width: 660px) {
+		.lead,
+		.index {
+			grid-template-columns: 1fr;
+		}
+		.lead {
+			gap: 22px;
+		}
+		.section-head {
+			padding-bottom: 12px;
+		}
+		.lead h3 {
+			font-size: 27px;
+		}
+		.plate {
+			aspect-ratio: 1.65;
+		}
+		.index {
+			margin-top: 34px;
+		}
+		.preview {
+			display: none;
+		}
+		.row {
+			position: relative;
+			align-items: center;
+			grid-template-columns: 1fr auto;
+			gap: 5px 12px;
+			padding: 15px 0;
+		}
+		.row time,
+		.row-title,
+		.category {
+			grid-column: 1;
+		}
+		.row-title {
+			font-size: 18px;
+		}
+		.thumb {
+			display: block;
+			grid-column: 2;
+			grid-row: 1/4;
+			width: 67px;
+			height: 62px;
+			object-fit: contain;
+			background: #e9e6dc;
+		}
+		.category {
+			font-size: 12px;
+		}
+		.read-link {
+			margin-top: 14px;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.preview img {
+			transition: none;
+		}
+	}
+</style>

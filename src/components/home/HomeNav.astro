@@ -1,0 +1,314 @@
+---
+import { navBarConfig, profileConfig } from "@/config";
+import { Icon } from "astro-icon/components";
+const direct = navBarConfig.links.filter((link) =>
+	["番剧", "网址导航", "相册"].includes(link.name),
+);
+const extra = navBarConfig.links
+	.flatMap((link) => link.children || [])
+	.filter((link) => !direct.some((d) => d.url === link.url));
+---
+
+<header class="home-nav">
+	<a class="brand" href="/" aria-label={profileConfig.name + " 首页"}>
+		<img src="/favicon/huazai666.png" alt="" width="25" height="25" />{
+			profileConfig.name
+		}
+	</a>
+	<nav aria-label="主导航">
+		<a href="/" class="direct selected" aria-current="page">
+			<Icon name="material-symbols:home" />主页
+		</a>
+		<a href="#articles" class="direct">
+			<Icon name="material-symbols:article" />文章
+		</a>
+		{
+			direct.map((link) => (
+				<a class="direct" href={link.url}>
+					<Icon name={link.icon!} />
+					{link.name}
+				</a>
+			))
+		}
+		<details id="home-menu">
+			<summary>
+				<Icon name="material-symbols:apps" /><span class="wide">更多</span><span
+					class="small"
+				>
+					菜单
+				</span><Icon name="material-symbols:keyboard-arrow-down" />
+			</summary>
+			<div class="menu-list">
+				<a href="/" class="small" aria-current="page">主页</a><a
+					href="#articles"
+					class="small"
+				>
+					文章
+				</a>
+				{
+					direct.map((link) => (
+						<a class="small" href={link.url}>
+							{link.name}
+						</a>
+					))
+				}{extra.map((link) => <a href={link.url}>{link.name}</a>)}
+			</div>
+		</details>
+	</nav>
+	<a href="/search/" class="search" aria-label="搜索文章">
+		<kbd aria-hidden="true">⌘K</kbd><Icon name="material-symbols:search" />
+	</a>
+</header>
+<dialog id="home-search" aria-label="搜索文章">
+	<form action="/search/" role="search">
+		<label for="home-query">搜索文章</label><div>
+			<input
+				type="search"
+				name="q"
+				id="home-query"
+				placeholder="输入标题或关键词"
+				required
+				autofocus
+			/><button type="submit">搜索</button>
+		</div>
+	</form><button class="close" aria-label="关闭搜索">×</button>
+</dialog>
+<script>
+	const menu = document.querySelector<HTMLDetailsElement>("#home-menu")!;
+	const dialog = document.querySelector<HTMLDialogElement>("#home-search")!;
+	const search =
+		document.querySelector<HTMLAnchorElement>(".home-nav .search")!;
+	const shortcut = search.querySelector("kbd")!;
+	if (!/Mac|iPhone|iPad/.test(navigator.platform))
+		shortcut.textContent = "Ctrl K";
+	function openSearch() {
+		menu.open = false;
+		dialog.showModal();
+		dialog.querySelector("input")?.focus();
+	}
+	search.addEventListener("click", (event) => {
+		if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+			event.preventDefault();
+			openSearch();
+		}
+	});
+	dialog
+		.querySelector("button.close")!
+		.addEventListener("click", () => dialog.close());
+	document.addEventListener("keydown", (event) => {
+		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+			event.preventDefault();
+			if (!dialog.open) openSearch();
+		}
+		if (event.key === "Escape" && menu.open) {
+			menu.open = false;
+			menu.querySelector("summary")?.focus();
+		}
+	});
+	document.addEventListener("click", (event) => {
+		if (
+			event.target instanceof Element &&
+			(!menu.contains(event.target) || event.target.closest("a"))
+		)
+			menu.open = false;
+	});
+</script>
+<style>
+	.home-nav {
+		position: fixed;
+		z-index: 8;
+		top: 12px;
+		left: var(--edge);
+		right: var(--edge);
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: start;
+		pointer-events: none;
+		color: #f6f4ef;
+	}
+	.home-nav > a,
+	nav {
+		pointer-events: auto;
+		border-radius: 999px;
+		background: #0c0c0df7;
+		box-shadow: 0 3px 16px #0003;
+	}
+	.brand,
+	nav,
+	.direct,
+	summary,
+	.search {
+		display: flex;
+		align-items: center;
+	}
+	.brand,
+	.search {
+		height: 44px;
+		gap: 9px;
+		padding: 0 16px;
+		justify-self: start;
+		font-weight: 650;
+	}
+	.brand img {
+		border-radius: 50%;
+	}
+	.search {
+		justify-self: end;
+	}
+	.search kbd {
+		font: 500 12px system-ui;
+		color: #d3d0ce;
+	}
+	.search svg {
+		width: 21px;
+		height: 21px;
+	}
+	nav {
+		padding: 4px 6px;
+		gap: 2px;
+		font-size: 15px;
+		font-weight: 620;
+	}
+	.direct,
+	summary {
+		border-radius: 999px;
+		padding: 0 13px;
+		height: 36px;
+		gap: 6px;
+	}
+	.direct svg,
+	summary svg {
+		width: 16px;
+		height: 16px;
+	}
+	.direct.selected {
+		background: #faf9f5;
+		color: #121211;
+	}
+	.direct:not(.selected):hover,
+	summary:hover,
+	.brand:hover,
+	.search:hover {
+		background: #323232;
+		color: white;
+	}
+	details {
+		position: relative;
+	}
+	summary {
+		cursor: pointer;
+		list-style: none;
+	}
+	summary::-webkit-details-marker {
+		display: none;
+	}
+	.menu-list {
+		position: absolute;
+		top: calc(100% + 10px);
+		right: 0;
+		min-width: 174px;
+		max-height: 70svh;
+		overflow: auto;
+		border-radius: 16px;
+		padding: 8px;
+		background: #111112;
+		box-shadow: 0 5px 24px #0005;
+	}
+	.menu-list a {
+		display: block;
+		padding: 9px 13px;
+		border-radius: 10px;
+	}
+	.menu-list a:hover,
+	.menu-list a:focus-visible {
+		background: #353533;
+	}
+	.small,
+	.menu-list .small {
+		display: none;
+	}
+	dialog {
+		background: #f6f3eb;
+		color: #24251f;
+		border: 1px solid #aaa491;
+		border-radius: 16px;
+		width: min(410px, calc(100% - 36px));
+		padding: 25px;
+	}
+	dialog::backdrop {
+		background: #15151285;
+	}
+	form label {
+		font-size: 21px;
+		font-weight: 650;
+	}
+	form div {
+		display: flex;
+		gap: 8px;
+		margin-top: 18px;
+	}
+	input {
+		min-width: 0;
+		flex: 1;
+		padding: 10px;
+		border: 1px solid #938e82;
+		border-radius: 7px;
+		font: inherit;
+	}
+	form button,
+	.close {
+		cursor: pointer;
+	}
+	form button {
+		background: #252520;
+		color: white;
+		border: 0;
+		border-radius: 7px;
+		padding: 0 16px;
+	}
+	.close {
+		position: absolute;
+		right: 12px;
+		top: 12px;
+		border: 0;
+		background: none;
+		font-size: 22px;
+	}
+	@media (max-width: 940px) {
+		.home-nav {
+			grid-template-columns: 1fr auto 1fr;
+		}
+		.direct,
+		.wide {
+			display: none;
+		}
+		.small,
+		.menu-list .small {
+			display: block;
+		}
+		.menu-list {
+			right: 50%;
+			transform: translateX(50%);
+		}
+		.brand,
+		.search {
+			padding: 0 12px;
+		}
+		.search kbd {
+			display: none;
+		}
+	}
+	@media (max-width: 390px) {
+		.home-nav {
+			left: 12px;
+			right: 12px;
+		}
+		.brand {
+			font-size: 14px;
+		}
+	}
+	@media (max-width: 355px) {
+		.home-nav { grid-template-columns:auto 1fr auto; }
+		nav { justify-self:center; }
+	}
+</style>

@@ -25,55 +25,6 @@ export const booknavPageConfig: BooknavPageConfig = {
 // 每个数组项是一个分类组，分类组内的 items 是该分类下的书签
 export const booknavConfig: BooknavGroup[] = [
 	{
-		id: "owner",
-		name: "番茄主理人",
-		weight: 100,
-		items: [
-			{
-				title: "番茄の主页",
-				url: "https://home.fqzlr.com/",
-				desc: "个人站点入口",
-				weight: 100,
-			},
-			{
-				title: "番茄の笔记",
-				url: "https://bj.fqzlr.com/",
-				desc: "作者的在线笔记",
-				weight: 99,
-			},
-			{
-				title: "友链检测",
-				url: "https://check.fqzlr.com/",
-				desc: "检查友情链接状态",
-				weight: 98,
-			},
-			{
-				title: "网站统计",
-				url: "https://umami.fqzlr.com/share/kHCJG2ZUL1r6q5Js",
-				desc: "公开访问统计",
-				weight: 97,
-			},
-			{
-				title: "邮箱",
-				url: "https://fqzlr.edu.kg/inbox",
-				desc: "Cloud Mail 收件箱",
-				weight: 96,
-			},
-			{
-				title: "临时邮箱",
-				url: "https://email.fqzlr.com/",
-				desc: "临时收件服务",
-				weight: 95,
-			},
-			{
-				title: "排行工具",
-				url: "https://ranktool.fqzlr.com/",
-				desc: "在线制作排行榜",
-				weight: 94,
-			},
-		],
-	},
-	{
 		id: "tools",
 		name: "工具箱",
 		weight: 99,
