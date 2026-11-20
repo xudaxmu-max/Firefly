@@ -1,0 +1,26 @@
+---
+import { Icon } from "astro-icon/components";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+interface Props { title: string; icon: string; description?: string }
+const { title, icon, description } = Astro.props;
+---
+<MainGridLayout title={title} description={description || title}>
+  <section class="collection card-base">
+    <header><Icon name={icon} is:inline/><h1>{title}</h1></header>
+    {description && <p class="summary">{description}</p>}
+    <slot/>
+  </section>
+</MainGridLayout>
+<style>
+.collection { padding: clamp(1.25rem, 4vw, 2.5rem); color: var(--content-text); }
+header { display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem; }
+header :global(svg){ color:var(--primary); font-size:1.9rem; }
+h1 {font-weight:750; font-size:clamp(1.6rem,3vw,2.25rem);}
+.summary {color:var(--content-meta); margin:-.65rem 0 1.5rem;}
+.collection :global(.entries){display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:1rem;}
+.collection :global(.entry){display:grid;align-content:start;gap:.6rem;padding:1.15rem;border:1px solid var(--line-divider);border-radius:1rem;}
+.collection :global(.entry h2){font-size:1.15rem;font-weight:700;}
+.collection :global(.entry p){font-size:.92rem;color:var(--content-meta);line-height:1.65;}
+.collection :global(a.entry:hover), .collection :global(a.entry:focus-visible){border-color:var(--primary);color:var(--primary);}
+.collection :global(.entry > svg){font-size:2.1rem;color:var(--primary);}
+</style>

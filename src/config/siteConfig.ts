@@ -100,13 +100,13 @@ export const siteConfig: SiteConfig = {
 		// 番组计划页面开关，含追番、游戏、书籍和音乐
 		bangumi: false,
 		// 相册页面开关
-		gallery: false,
+		gallery: true,
 		// 追番页面开关
 		anime: true,
 		// 动态页面开关
 		dynamic: false,
 		// 书签导航页面开关
-		booknav: false,
+		booknav: true,
 	},
 
 	// 分类导航栏开关，在首页和归档页顶部显示分类快捷导航

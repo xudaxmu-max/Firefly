@@ -1,0 +1,11 @@
+---
+import CollectionLayout from "@/layouts/CollectionLayout.astro";
+const projects = [
+  {name:"PlanktoScope 原型机部件清单",text:"从树莓派到直线步进电机，按部件核对原型机的用料。",image:"/media/previous-blog/content/_resources/3D_PCB_2026-01-18.png",link:"/posts/planktoscope原型机部件清单/"},
+  {name:"huazai666 个人博客",text:"基于 Astro 和 Firefly 搭建的个人站点，收录工作笔记、相册与追番记录。",image:"/gallery/blog-art/balcony.webp",link:"https://github.com/xudaxmu-max/Firefly"},
+];
+---
+<CollectionLayout title="项目" icon="material-symbols:folder-open-rounded">
+  <div class="entries">{projects.map(p=><a href={p.link} class="entry"><img alt="" src={p.image}/><h2>{p.name}</h2><p>{p.text}</p></a>)}</div>
+</CollectionLayout>
+<style>img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:.6rem;margin-bottom:.3rem;}</style>

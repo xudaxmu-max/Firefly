@@ -169,7 +169,7 @@ const logoVariants = await Promise.all(
                 </div>
             </a>
             <div class:list={[
-                "hidden lg:flex items-center space-x-1 col-start-2",
+                "navbar-desktop-links hidden xl:flex items-center space-x-1 col-start-2",
                 isNavbarMenuCentered
                     ? "justify-center"
                     : "justify-start pl-2"
@@ -207,7 +207,7 @@ const logoVariants = await Promise.all(
                 )}
                 {/* @ts-ignore */}
                 <LightDarkSwitch client:load></LightDarkSwitch>
-                <button aria-label="Menu" aria-controls="nav-menu-panel" aria-expanded="false" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-9 h-9 md:w-11 md:h-11 active:scale-90 lg:hidden!" id="nav-menu-switch">
+                <button aria-label="Menu" aria-controls="nav-menu-panel" aria-expanded="false" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-9 h-9 md:w-11 md:h-11 active:scale-90 xl:hidden!" id="nav-menu-switch">
                     <Icon is:inline name="material-symbols:menu-rounded" class="text-[1.25rem]"></Icon>
                 </button>
             </div>
@@ -434,3 +434,13 @@ if (document.readyState === 'loading') {
         </script>
     )
 }
+
+<style>
+  @media (min-width: 80rem) and (max-width: 97.49rem) {
+    .navbar-desktop-links :global(.navbar-icon) { display: none; }
+    .navbar-desktop-links :global(.dropdown-container > a),
+    .navbar-desktop-links :global(.dropdown-trigger) { padding-inline: .55rem; white-space: nowrap; }
+    .navbar-desktop-links :global(.dropdown-trigger) { padding-inline-end: 1.5rem; }
+    .navbar-desktop-links :global(.dropdown-arrow) { right: .25rem; }
+  }
+</style>

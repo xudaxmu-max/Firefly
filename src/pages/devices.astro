@@ -1,0 +1,12 @@
+---
+import { Icon } from "astro-icon/components";
+import CollectionLayout from "@/layouts/CollectionLayout.astro";
+const devices = [
+  { name:"电脑", icon:"material-symbols:computer" },
+  { name:"手机", icon:"material-symbols:smartphone" },
+  { name:"平板", icon:"material-symbols:tablet" },
+];
+---
+<CollectionLayout title="我的设备" icon="material-symbols:devices">
+ <ul class="entries">{devices.map(device=><li class="entry"><Icon is:inline name={device.icon}/><h2>{device.name}</h2></li>)}</ul>
+</CollectionLayout>

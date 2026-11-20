@@ -1,0 +1,23 @@
+---
+import CollectionLayout from "@/layouts/CollectionLayout.astro";
+import { getSortedPosts } from "@/utils/content-utils";
+import { getPostUrlBySlug } from "@/utils/url-utils";
+const posts = await getSortedPosts();
+const events = [
+  { date: "2026-11-20", title: "旧博客文章迁入新站", url: "/archive/" },
+  ...posts.map(post => ({ date: post.data.published.toISOString().slice(0,10), title: post.data.title, url: getPostUrlBySlug(post.id) })),
+].sort((a,b)=>b.date.localeCompare(a.date));
+const years = [...new Set(events.map(item=>item.date.slice(0,4)))];
+---
+<CollectionLayout title="时间线" icon="material-symbols:timeline" description="按日期回看文章和博客的重要更新。">
+  {years.map(year=><section><h2>{year}</h2><ol>{events.filter(e=>e.date.startsWith(year)).map(e=>
+    <li><time datetime={e.date}>{e.date.slice(5)}</time><a href={e.url}>{e.title}</a></li>)}</ol></section>)}
+</CollectionLayout>
+<style>
+h2 {font-size:1.5rem;font-weight:700;margin:1.6rem 0 .6rem;}
+ol {border-inline-start:2px solid var(--line-divider);margin-left:.3rem;}
+li {position:relative;padding:.8rem 0 .8rem 1.2rem;display:grid;grid-template-columns:3.2rem 1fr;gap:.6rem;}
+li::before {content:"";position:absolute;left:-5px;top:1.3rem;width:8px;height:8px;background:var(--primary);border-radius:100%;}
+time {font-variant-numeric:tabular-nums;color:var(--content-meta);}
+a:hover {color:var(--primary);text-decoration:underline;}
+</style>

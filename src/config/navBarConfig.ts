@@ -72,6 +72,39 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		],
 	});
 
+	links.push(
+		{ ...LinkPresets.Anime, name: "番剧" },
+		{ ...LinkPresets.Booknav, name: "网址导航" },
+		LinkPresets.Gallery,
+		{
+			name: "更多",
+			url: "#",
+			icon: "material-symbols:apps",
+			children: [
+				{
+					name: "时间线",
+					url: "/timeline/",
+					icon: "material-symbols:timeline",
+				},
+				{
+					name: "项目",
+					url: "/projects/",
+					icon: "material-symbols:folder-open-rounded",
+				},
+				{
+					name: "我的设备",
+					url: "/devices/",
+					icon: "material-symbols:devices",
+				},
+				{
+					name: "技能",
+					url: "/skills/",
+					icon: "material-symbols:construction",
+				},
+			],
+		},
+	);
+
 	return { links } as NavBarConfig;
 };
 
