@@ -1,5 +1,6 @@
 ---
 import { navBarConfig, profileConfig } from "@/config";
+import DiscoverySearch from "./DiscoverySearch.astro";
 import { Icon } from "astro-icon/components";
 const direct = [
 	{ name: "主页", url: "/", icon: "material-symbols:home" },
@@ -72,39 +73,15 @@ const activeMore = extra.some((link) => current(link.url));
 			</div>
 		</details>
 	</nav>
-	<a
-		href="/search/"
-		aria-current={current("/search/") ? "location" : undefined}
-		class="search"
-		aria-label="搜索文章"
-	>
-		<kbd aria-hidden="true">⌘K</kbd><Icon name="material-symbols:search" />
-	</a>
+	<DiscoverySearch />
 </header>
-<dialog id="home-search" aria-label="搜索文章">
-	<form action="/search/" role="search">
-		<label for="home-query">搜索文章</label><div>
-			<input
-				type="search"
-				name="q"
-				id="home-query"
-				placeholder="输入标题或关键词"
-				required
-				autofocus
-			/><button type="submit">搜索</button>
-		</div>
-	</form><button class="close" aria-label="关闭搜索">×</button>
-</dialog>
 <script>
 	const menu = document.querySelector<HTMLDetailsElement>("#home-menu")!;
-	const dialog = document.querySelector<HTMLDialogElement>("#home-search")!;
-	const search =
-		document.querySelector<HTMLAnchorElement>(".home-nav .search")!;
 	function syncLocation() {
 		const pathname = location.pathname.replace(/\/?$/, "/");
 		let more = false;
 		for (const link of document.querySelectorAll<HTMLAnchorElement>(
-			".home-nav nav a, .home-nav .search",
+			".home-nav nav a",
 		)) {
 			const active =
 				link.origin === location.origin &&
@@ -117,32 +94,10 @@ const activeMore = extra.some((link) => current(link.url));
 		}
 		menu.querySelector("summary")?.classList.toggle("selected", more);
 		menu.open = false;
-		if (dialog.open) dialog.close();
 	}
 	document.addEventListener("swup:page:view", syncLocation);
 	window.addEventListener("pageshow", syncLocation);
-	const shortcut = search.querySelector("kbd")!;
-	if (!/Mac|iPhone|iPad/.test(navigator.platform))
-		shortcut.textContent = "Ctrl K";
-	function openSearch() {
-		menu.open = false;
-		dialog.showModal();
-		dialog.querySelector("input")?.focus();
-	}
-	search.addEventListener("click", (event) => {
-		if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-			event.preventDefault();
-			openSearch();
-		}
-	});
-	dialog
-		.querySelector("button.close")!
-		.addEventListener("click", () => dialog.close());
 	document.addEventListener("keydown", (event) => {
-		if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-			event.preventDefault();
-			if (!dialog.open) openSearch();
-		}
 		if (event.key === "Escape" && menu.open) {
 			menu.open = false;
 			menu.querySelector("summary")?.focus();
@@ -179,13 +134,11 @@ const activeMore = extra.some((link) => current(link.url));
 	.brand,
 	nav,
 	.direct,
-	summary,
-	.search {
+	summary {
 		display: flex;
 		align-items: center;
 	}
-	.brand,
-	.search {
+	.brand {
 		height: 44px;
 		gap: 9px;
 		padding: 0 16px;
@@ -201,17 +154,6 @@ const activeMore = extra.some((link) => current(link.url));
 	}
 	.brand img {
 		border-radius: 50%;
-	}
-	.search {
-		justify-self: end;
-	}
-	.search kbd {
-		font: 500 12px system-ui;
-		color: #d3d0ce;
-	}
-	.search svg {
-		width: 21px;
-		height: 21px;
 	}
 	nav {
 		padding: 4px 6px;
@@ -233,15 +175,13 @@ const activeMore = extra.some((link) => current(link.url));
 	}
 	.direct[aria-current],
 	summary.selected,
-	.search[aria-current],
 	.menu-list a[aria-current] {
 		background: #faf9f5;
 		color: #121211;
 	}
 	.direct:not([aria-current]):hover,
 	summary:hover,
-	.brand:hover,
-	.search:hover {
+	.brand:hover {
 		background: #323232;
 		color: white;
 	}
@@ -280,53 +220,17 @@ const activeMore = extra.some((link) => current(link.url));
 	.menu-list .small {
 		display: none;
 	}
-	dialog {
-		margin: auto;
-		background: #f6f3eb;
-		color: #24251f;
-		border: 1px solid #aaa491;
-		border-radius: 16px;
-		width: min(410px, calc(100% - 36px));
-		padding: 25px;
+	@media (max-width: 1460px) {
+		:global(.home-nav:has(discovery-search[expanded])) nav {
+			visibility: hidden;
+			opacity: 0;
+		}
 	}
-	dialog::backdrop {
-		background: #15151285;
-	}
-	form label {
-		font-size: 21px;
-		font-weight: 650;
-	}
-	form div {
-		display: flex;
-		gap: 8px;
-		margin-top: 18px;
-	}
-	input {
-		min-width: 0;
-		flex: 1;
-		padding: 10px;
-		border: 1px solid #938e82;
-		border-radius: 7px;
-		font: inherit;
-	}
-	form button,
-	.close {
-		cursor: pointer;
-	}
-	form button {
-		background: #252520;
-		color: white;
-		border: 0;
-		border-radius: 7px;
-		padding: 0 16px;
-	}
-	.close {
-		position: absolute;
-		right: 12px;
-		top: 12px;
-		border: 0;
-		background: none;
-		font-size: 22px;
+	@media (max-width: 560px) {
+		:global(.home-nav:has(discovery-search[expanded])) .brand {
+			visibility: hidden;
+			opacity: 0;
+		}
 	}
 	@media (max-width: 940px) {
 		.home-nav {
@@ -344,12 +248,8 @@ const activeMore = extra.some((link) => current(link.url));
 			right: 50%;
 			transform: translateX(50%);
 		}
-		.brand,
-		.search {
+		.brand {
 			padding: 0 12px;
-		}
-		.search kbd {
-			display: none;
 		}
 	}
 	@media (max-width: 390px) {
