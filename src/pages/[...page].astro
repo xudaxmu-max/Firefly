@@ -19,7 +19,11 @@ const len = page.data.length;
 ---
 
 <MainGridLayout>
-  <PostPage page={page} />
+  {len === 0 ? (
+    <p class="card-base p-6 text-center">暂无公开文章</p>
+  ) : (
+    <PostPage page={page} />
+  )}
   {
     page.total > page.size && (
       <Pagination
