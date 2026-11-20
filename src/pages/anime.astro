@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { Icon } from "astro-icon/components";
 import AnimeGrid from "@/components/pages/anime/AnimeGrid.svelte";
 import { siteConfig } from "@/config";
+import follows from "@/data/bilibili-follows.json";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
@@ -133,7 +134,9 @@ if (BILIBILI_UID) {
 				`https://api.bilibili.com/x/space/bangumi/follow/list?type=${type}&vmid=${BILIBILI_UID}&pn=1&ps=${ps}`,
 			);
 			const firstJson = await firstRes.json();
-			if (firstJson.code !== 0 || !firstJson.data?.list?.length) return items;
+			if (firstJson.code === -403 || firstJson.code === 53013) return items;
+			if (firstJson.code !== 0) throw new Error(`Bilibili API: ${firstJson.code}`);
+			if (!firstJson.data?.list?.length) return items;
 
 			items.push(...firstJson.data.list);
 			const total = firstJson.data.total || items.length;
@@ -156,13 +159,14 @@ if (BILIBILI_UID) {
 					items.push(...batch);
 				}
 			}
+			if (items.length !== total) throw new Error("Incomplete Bilibili list");
 			return items;
 		}
 
 		// 并发获取追番和追剧
 		const [animeItems, dramaItems] = await Promise.all([
-			fetchBilibiliByType(1),
-			fetchBilibiliByType(2),
+			fetchBilibiliByType(1).catch(() => BILIBILI_UID === follows.uid ? follows.anime : []),
+			fetchBilibiliByType(2).catch(() => BILIBILI_UID === follows.uid ? follows.drama : []),
 		]);
 		bilibiliItems = [...animeItems, ...dramaItems];
 		console.log(

@@ -33,7 +33,44 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		],
 	});
 
-	links.push(LinkPresets.About);
+	//社交及其子菜单
+	links.push({
+		name: "社交",
+		url: "#",
+		icon: "material-symbols:group",
+		children: [LinkPresets.Guestbook],
+	});
+
+	// 我的及其子菜单
+	links.push({
+		name: "我的",
+		url: "#",
+		icon: "material-symbols:person",
+		children: [LinkPresets.Anime],
+	});
+
+	// 关于及其子菜单
+	links.push({
+		name: "关于",
+		url: "#",
+		icon: "material-symbols:info",
+		children: [LinkPresets.About],
+	});
+
+	links.push({
+		name: "链接",
+		url: "#",
+		icon: "material-symbols:link",
+		children: [
+			{
+				name: "博客源码",
+				url: "https://github.com/xudaxmu-max/Firefly",
+				external: true,
+				icon: "fa7-brands:github",
+			},
+			{ name: "RSS 订阅", url: "/rss/", icon: "fa7-solid:rss" },
+		],
+	});
 
 	return { links } as NavBarConfig;
 };

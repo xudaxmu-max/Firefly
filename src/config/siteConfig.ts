@@ -73,7 +73,7 @@ export const siteConfig: SiteConfig = {
 		// 导航栏标题
 		title: "huazai666",
 		// 全宽导航栏，导航栏是否占满屏幕宽度
-		widthFull: false,
+		widthFull: true,
 		// 导航菜单对齐方式，left：左对齐，center：居中
 		menuAlign: "center",
 		// 导航栏图标和标题是否跟随主题色
@@ -96,13 +96,13 @@ export const siteConfig: SiteConfig = {
 		// 打赏页面开关
 		sponsor: false,
 		// 留言板页面开关，需要配置评论系统
-		guestbook: false,
+		guestbook: true,
 		// 番组计划页面开关，含追番、游戏、书籍和音乐
 		bangumi: false,
 		// 相册页面开关
 		gallery: false,
 		// 追番页面开关
-		anime: false,
+		anime: true,
 		// 动态页面开关
 		dynamic: false,
 		// 书签导航页面开关
@@ -189,7 +189,7 @@ export const siteConfig: SiteConfig = {
 	// bangumi配置
 	bangumi: {
 		// Bangumi用户ID
-		userId: "1143164",
+		userId: "",
 		// 数据模式：static=构建时获取，dynamic=客户端实时获取
 		// static 模式在构建时获取数据并静态渲染，部署后数据不更新
 		// dynamic 模式在浏览器中实时请求 API，始终显示最新数据
