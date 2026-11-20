@@ -26,11 +26,7 @@
 				disabled
 			/>
 		</div>
-		<button class="dismiss" type="button" aria-label="收起搜索" disabled>
-			<svg aria-hidden="true" viewBox="0 0 24 24">
-				<path d="m6 6 12 12M18 6 6 18"></path>
-			</svg>
-		</button>
+
 	</form>
 </discovery-search>
 <script>
@@ -39,7 +35,6 @@
 			const form = this.querySelector("form")!;
 			const trigger = this.querySelector("a")!;
 			const input = this.querySelector("input")!;
-			const dismiss = this.querySelector("button")!;
 			const controller = new AbortController();
 			this.cleanup = () => controller.abort();
 			const options = { signal: controller.signal };
@@ -47,7 +42,7 @@
 				this.toggleAttribute("expanded", expanded);
 				trigger.setAttribute("aria-expanded", String(expanded));
 				trigger.setAttribute("aria-label", expanded ? "提交搜索" : "展开搜索");
-				input.disabled = dismiss.disabled = !expanded;
+				input.disabled = !expanded;
 				if (expanded) {
 					const menu = this.closest("header")?.querySelector("details");
 					if (menu) menu.open = false;
@@ -78,11 +73,6 @@
 						input.focus();
 					}
 				},
-				options,
-			);
-			dismiss.addEventListener(
-				"click",
-				() => setExpanded(false, true),
 				options,
 			);
 			document.addEventListener(
@@ -130,67 +120,46 @@
 </script>
 <style>
 	discovery-search {
-		--size: 56px;
-		--paper: #fff;
-		--ink: #171717;
-		--stroke: #efefef;
-		--placeholder: #707070;
+		--closed-width: 68px;
 		--spring: cubic-bezier(0.22, 1.2, 0.32, 1);
 		justify-self: end;
 		position: relative;
-		height: var(--size);
-		width: var(--size);
+		height: var(--nav-height);
+		width: var(--closed-width);
 		pointer-events: auto;
-	}
-	:global(html.dark) discovery-search {
-		--paper: #171717;
-		--ink: #f4f4f4;
-		--stroke: #333;
-		--placeholder: #aaa;
 	}
 	form {
 		position: absolute;
 		right: 0;
 		top: 0;
-		display: flex;
-		align-items: center;
-		gap: 0;
 		margin: 0;
-		transition: gap 0.4s var(--spring);
-	}
-	.field,
-	.dismiss {
-		display: flex;
-		align-items: center;
-		height: var(--size);
-		border: 1px solid var(--stroke);
-		border-radius: 28px;
-		background: var(--paper);
-		color: var(--ink);
-		box-shadow: 0 2px 9px #0002;
 	}
 	.field {
-		width: var(--size);
+		display: flex;
+		align-items: center;
+		height: var(--nav-height);
+		width: var(--closed-width);
 		overflow: hidden;
+		border-radius: 999px;
+		background: var(--nav-surface);
+		color: inherit;
+		box-shadow: var(--nav-shadow);
 		transition: width 0.56s var(--spring);
 	}
-	discovery-search[expanded] form {
-		gap: 8px;
-	}
 	discovery-search[expanded] .field {
-		width: min(320px, calc(100vw - var(--size) - 48px));
+		width: min(300px, calc(100vw - 36px));
 	}
-	.trigger,
-	.dismiss {
+	.trigger {
 		display: grid;
 		place-items: center;
 		cursor: pointer;
-	}
-	.trigger {
-		width: calc(var(--size) - 2px);
+		width: var(--closed-width);
 		height: 100%;
 		flex: none;
 		color: inherit;
+	}
+	discovery-search[expanded] .trigger {
+		width: var(--nav-height);
 	}
 	svg {
 		width: 19px;
@@ -203,7 +172,7 @@
 	}
 	input {
 		background: transparent;
-		color: var(--ink);
+		color: inherit;
 		border: 0;
 		outline: 0;
 		min-width: 0;
@@ -223,7 +192,7 @@
 			filter 0.15s;
 	}
 	input::placeholder {
-		color: var(--placeholder);
+		color: #c7c6c4;
 	}
 	input::-webkit-search-cancel-button {
 		display: none;
@@ -233,42 +202,12 @@
 		transform: none;
 		filter: none;
 	}
-	.dismiss {
-		width: 0;
-		min-width: 0;
-		overflow: hidden;
-		opacity: 0;
-		border-width: 0;
-		padding: 0;
-		transform: scale(0.65);
-		pointer-events: none;
-		transition:
-			width 0.48s var(--spring),
-			transform 0.45s var(--spring),
-			opacity 0.18s;
-	}
-	discovery-search[expanded] .dismiss {
-		width: var(--size);
-		opacity: 1;
-		transform: none;
-		border-width: 1px;
-		pointer-events: auto;
-	}
-	.field:focus-within,
-	.dismiss:focus-visible {
-		outline: 2px solid #aa854e;
+	.field:has(.trigger:focus-visible) {
+		outline: 2px solid #d9b878;
 		outline-offset: 2px;
 	}
-	@media (max-width: 640px) {
-		discovery-search {
-			--size: 48px;
-		}
-	}
 	@media (prefers-reduced-motion: reduce) {
-		form,
-		.field,
-		input,
-		.dismiss {
+		.field, input {
 			transition: none;
 		}
 	}

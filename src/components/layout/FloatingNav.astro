@@ -113,6 +113,9 @@ const activeMore = extra.some((link) => current(link.url));
 </script>
 <style>
 	.home-nav {
+		--nav-height: 44px;
+		--nav-surface: #0c0c0df7;
+		--nav-shadow: 0 3px 16px #0003;
 		position: fixed;
 		z-index: 8;
 		top: 12px;
@@ -128,8 +131,8 @@ const activeMore = extra.some((link) => current(link.url));
 	nav {
 		pointer-events: auto;
 		border-radius: 999px;
-		background: #0c0c0df7;
-		box-shadow: 0 3px 16px #0003;
+		background: var(--nav-surface);
+		box-shadow: var(--nav-shadow);
 	}
 	.brand,
 	nav,
@@ -139,7 +142,7 @@ const activeMore = extra.some((link) => current(link.url));
 		align-items: center;
 	}
 	.brand {
-		height: 44px;
+		height: var(--nav-height);
 		gap: 9px;
 		padding: 0 16px;
 		justify-self: start;
@@ -165,7 +168,7 @@ const activeMore = extra.some((link) => current(link.url));
 	summary {
 		border-radius: 999px;
 		padding: 0 13px;
-		height: 36px;
+		height: calc(var(--nav-height) - 8px);
 		gap: 6px;
 	}
 	.direct svg,
@@ -220,7 +223,7 @@ const activeMore = extra.some((link) => current(link.url));
 	.menu-list .small {
 		display: none;
 	}
-	@media (max-width: 1460px) {
+	@media (max-width: 1280px) {
 		:global(.home-nav:has(discovery-search[expanded])) nav {
 			visibility: hidden;
 			opacity: 0;
