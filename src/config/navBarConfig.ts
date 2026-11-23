@@ -82,6 +82,11 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 			icon: "material-symbols:apps",
 			children: [
 				{
+					name: "工作日志",
+					url: "/work-log/",
+					icon: "material-symbols:article",
+				},
+				{
 					name: "时间线",
 					url: "/timeline/",
 					icon: "material-symbols:timeline",

@@ -62,6 +62,7 @@ const activeMore = extra.some((link) => current(link.url));
 				{
 					extra.map((link) => (
 						<a
+							data-no-swup={link.url === "/work-log/" ? "" : undefined}
 							href={link.url}
 							aria-current={current(link.url) ? "location" : undefined}
 						>
