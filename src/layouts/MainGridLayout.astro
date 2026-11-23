@@ -995,28 +995,3 @@ const hasMultipleImages =
   }
 
 </style>
-
-
-<style is:global>
-  body.is-home #left-sidebar-wrapper {
-    display: none;
-  }
-
-  @media (min-width: 768px) {
-    body.is-home #main-grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    body.is-home #main-grid > :is(.main-content-column, .footer) {
-      grid-column: 1;
-    }
-  }
-
-  @media (min-width: 1280px) {
-    body.is-home #main-grid:has(#right-sidebar) {
-      grid-template-columns: minmax(0, 1fr) 17.5rem;
-    }
-    body.is-home #right-sidebar {
-      grid-column: 2;
-    }
-  }
-</style>
