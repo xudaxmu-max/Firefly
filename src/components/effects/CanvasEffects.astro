@@ -1,0 +1,256 @@
+<canvas-effect class="reading-grid" data-effect="grid" aria-hidden="true"
+	><canvas></canvas></canvas-effect
+>
+<canvas-effect class="splash-cursor" data-effect="splash" aria-hidden="true"
+	><canvas></canvas></canvas-effect
+>
+
+<script>
+	class CanvasEffect extends HTMLElement {
+		private stop?: () => void;
+		private observer?: IntersectionObserver;
+		private themeObserver?: MutationObserver;
+		private layoutObserver?: MutationObserver;
+		private restoreLayout?: () => void;
+		private media = window.matchMedia("(prefers-reduced-motion: reduce)");
+		private visible = false;
+		private version = 0;
+		private restart = () => {
+			this.release();
+			if (this.visible) void this.start();
+		};
+
+		connectedCallback() {
+			this.observer = new IntersectionObserver(
+				(entries) => {
+					this.visible = entries.some((entry) => entry.isIntersecting);
+					if (this.visible) void this.start();
+					else this.release();
+				},
+				{ rootMargin: "160px" },
+			);
+			this.observer.observe(this);
+			this.media.addEventListener("change", this.restart);
+			if (this.dataset.effect === "splash") {
+				let dark = document.documentElement.classList.contains("dark");
+				this.themeObserver = new MutationObserver(() => {
+					const next = document.documentElement.classList.contains("dark");
+					if (next !== dark) {
+						dark = next;
+						this.restart();
+					}
+				});
+				this.themeObserver.observe(document.documentElement, {
+					attributes: true,
+					attributeFilter: ["class"],
+				});
+			}
+		}
+
+		private async start() {
+			if (this.stop || this.dataset.loading === "true") return;
+			const canvas = this.querySelector("canvas");
+			if (!canvas || (this.dataset.effect === "splash" && this.media.matches))
+				return;
+			const version = ++this.version;
+			this.dataset.loading = "true";
+			const current = () =>
+				this.isConnected && this.visible && version === this.version;
+			try {
+				if (this.dataset.effect === "waves") {
+					const { mountWaves } = await import("./Waves.js");
+					if (!current()) return;
+					this.stop = mountWaves(this, canvas, {
+						lineColor: "#a88a50",
+						accentColor: "#dec58c",
+						spacing: 14,
+						amplitude: 20,
+						scale: 1.2,
+						speed: 0.25,
+						mouseStrength: 0.35,
+						clickRipple: false,
+						intro: false,
+						fade: 0.3,
+						opacity: 0.45,
+						dpr: 1.5,
+					});
+				} else if (this.dataset.effect === "grid") {
+					const { mountShapeGrid } = await import("./ShapeGrid.js");
+					if (!current()) return;
+					this.alignReadingLayout();
+					this.stop = mountShapeGrid(this, canvas, {
+						shape: "square",
+						direction: "diagonal",
+						lineColor: "#2a2734",
+						hoverColor: "#ffffff",
+						hoverFillColor: "#ffffff",
+						fillOpacity: 0.15,
+						cellSize: 40,
+						speed: 0.5,
+						tiltX: 0,
+						tiltY: 0,
+						rainbow: false,
+						clickCascade: false,
+						intro: false,
+						fade: 0,
+						dpr: 1,
+					});
+				} else {
+					const { mountSplashCursor } = await import("./SplashCursor.js");
+					if (!current()) return;
+					this.stop = mountSplashCursor(
+						canvas,
+						{
+							rainbow: true,
+							size: 1,
+							force: 1,
+							swirl: 3,
+							trail: 1,
+							clickSplash: true,
+							intro: false,
+							quality: matchMedia("(pointer: coarse)").matches
+								? "low"
+								: "medium",
+							theme: document.documentElement.classList.contains("dark")
+								? "dark"
+								: "light",
+						},
+						this.restart,
+					);
+				}
+				this.dataset.ready = this.stop ? "true" : "fallback";
+			} catch (error) {
+				console.warn("Decorative effect unavailable", error);
+				this.dataset.ready = "fallback";
+			} finally {
+				if (version === this.version) this.dataset.loading = "false";
+			}
+		}
+
+		private alignReadingLayout() {
+			const layout = document.querySelector<HTMLElement>(
+				".main-layout-container",
+			);
+			if (!layout) return;
+			const properties = ["top", "margin-top"];
+			const values = ["5.5rem", "0px"];
+			const previous = properties.map((name) => [
+				layout.style.getPropertyValue(name),
+				layout.style.getPropertyPriority(name),
+			]);
+			const align = () => {
+				if (!document.querySelector("#post-container")) return;
+				properties.forEach((name, index) => {
+					if (layout.style.getPropertyValue(name) !== values[index]) {
+						previous[index] = [
+							layout.style.getPropertyValue(name),
+							layout.style.getPropertyPriority(name),
+						];
+						layout.style.setProperty(name, values[index], "important");
+					}
+				});
+			};
+			this.layoutObserver = new MutationObserver(align);
+			this.layoutObserver.observe(layout, {
+				attributes: true,
+				attributeFilter: ["style"],
+			});
+			align();
+			this.restoreLayout = () => {
+				this.layoutObserver?.disconnect();
+				properties.forEach((name, index) => {
+					if (layout.style.getPropertyValue(name) === values[index]) {
+						const [value, priority] = previous[index];
+						if (value) layout.style.setProperty(name, value, priority);
+						else layout.style.removeProperty(name);
+					}
+				});
+			};
+		}
+
+		private release() {
+			++this.version;
+			this.restoreLayout?.();
+			this.restoreLayout = undefined;
+			this.stop?.();
+			this.stop = undefined;
+			this.dataset.loading = "false";
+			delete this.dataset.ready;
+		}
+
+		disconnectedCallback() {
+			this.observer?.disconnect();
+			this.themeObserver?.disconnect();
+			this.media.removeEventListener("change", this.restart);
+			this.release();
+		}
+	}
+	if (!customElements.get("canvas-effect"))
+		customElements.define("canvas-effect", CanvasEffect);
+</script>
+
+<style is:global>
+	canvas-effect.reading-grid {
+		display: none;
+		position: fixed;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
+		z-index: 1;
+		background-color: var(--page-bg);
+	}
+	canvas-effect.reading-grid canvas {
+		display: block;
+		position: absolute;
+		top: 0;
+		left: 0;
+		transform-origin: 0 0;
+		opacity: 0.3;
+	}
+	.dark canvas-effect.reading-grid canvas {
+		opacity: 1;
+	}
+	body:has(#post-container) canvas-effect.reading-grid {
+		display: block;
+	}
+	@layer components {
+		body:has(#post-container) #wallpaper-wrapper {
+			display: none !important;
+			visibility: hidden !important;
+			opacity: 0 !important;
+		}
+		body:has(#post-container) .main-layout-container {
+			top: 0 !important;
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+			position: absolute !important;
+		}
+		body:has(#post-container) #main-grid {
+			transform: none !important;
+		}
+		body:has(#post-container) #post-container {
+			background: #f8fafb !important;
+			backdrop-filter: none;
+		}
+		.dark body:has(#post-container) #post-container {
+			background: #141b20 !important;
+		}
+	}
+	canvas-effect.splash-cursor {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 45;
+		pointer-events: none;
+	}
+	canvas-effect.splash-cursor canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		canvas-effect.splash-cursor {
+			display: none;
+		}
+	}
+</style>

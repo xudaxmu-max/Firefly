@@ -41,3 +41,5 @@ package/
 .codex*
 .claude
 .mimocode
+# Shared canvas engine copied for the standalone encrypted journal at build time.
+public/work-log/splash-engine.js
